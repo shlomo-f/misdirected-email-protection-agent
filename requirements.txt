@@ -15,6 +15,9 @@ python-dotenv
 pydantic>=2.0.0         # For strict data schemas
 tiktoken                # OpenAI's tokenizer (for chunking logic)
 
+# --- UI ---
+streamlit>=1.35.0
+
 # --- Utilities ---
 beautifulsoup4          # To help clean HTML from messy emails
 lxml                    # Fast parser for email processing
