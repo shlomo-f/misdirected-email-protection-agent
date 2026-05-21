@@ -1,0 +1,33 @@
+# Python Virtual Environments & Caches
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Environment Variables & Secrets
+.env
+.env.*
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# OS-Specific Garbage
+desktop.ini
+.DS_Store
+Thumbs.db
+
+# UI Dashboard Artifacts (Streamlit)
+.streamlit/
+
+# Local Databases & Vector Stores (DLP State)
+chroma_db/
+.chroma/
+*.json
+*.db
+*.sqlite3
