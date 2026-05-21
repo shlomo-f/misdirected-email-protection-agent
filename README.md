@@ -81,8 +81,7 @@ streamlit run app.py
 * **Phase 2 (DLP Contextual Interception):** Navigate to the composed email client and submit a sensitive draft. Because the draft discusses corporate project constraints or architecture specifications foreign to the recipient's baseline profile, the **Agent Terminal** will compute a semantic clash, issue a defensive warning state, and expose the specific risk reasoning.
 * **Phase 3 (Continuous Adaptation Feedback Loop):** Click **"Override & Send Anyway"**. This action explicitly bypasses the warning, routes the content directly back through the background ingestion graph, and mutates the contact's Persona Document on disk. Re-evaluating the exact same draft immediately afterward results in a **SAFE** verdict—proving the engineering loops successfully capture real-time context drifts.
 
-
-
+https://github.com/user-attachments/assets/65fa4b77-dc8f-48f0-8070-7b8fcd5ddd88
 
 ## 🗺️ Production Roadmap
 * **Deep Attachment Inspection:** Transition from metadata-only attachment tracking to full binary parsing (extracting raw text from `.pdf`, `.docx`, and `.xlsx` payloads) using deep-inspection pipelines.
