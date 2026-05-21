@@ -48,7 +48,7 @@ This system separates the evaluation and learning layers into two distinct, dete
 Clone the repository and install the dependencies inside a virtual environment:
 
 ```bash
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git)
+git clone https://github.com/shlomo-f/misdirected-email-protection-agent.git
 cd misdirected-email-protection-agent
 
 # Set up virtual environment
