@@ -22,6 +22,26 @@ class EmailVectorStore:
             persist_directory=self.persist_directory
         )
 
+    def clear_store(self):
+        """
+        Safely clears all collections and documents from ChromaDB 
+        """
+        try:
+            client = self.vector_db._client
+            client.delete_collection(name="email_history")
+            
+            # Recreate the collection so the wrapper remains valid for future operations
+            self.vector_db = Chroma(
+                collection_name="email_history",
+                embedding_function=self.embeddings,
+                persist_directory=self.persist_directory
+            )
+            print("✨ Vector Store collection successfully dropped and recreated.")
+            return True
+        except Exception as e:
+            print(f"❌ Error resetting vector store collection: {e}")
+            raise e
+
     def _extract_domain(self, email_str: str) -> str:
         """Helper to get 'company.com' from 'name <joe@company.com>'"""
         _, addr = parseaddr(email_str)
@@ -121,7 +141,8 @@ if __name__ == "__main__":
 
     # Peek into the Database
     db_content = store.vector_db.get(include=["documents", "metadatas", "embeddings"])
-    
+    print(f"\n📊 Total active records remaining in DB collection: {len(db_content['ids'])}")
+
     for i in range(len(db_content['ids'])):
         print(f"\n{'='*50}")
         print(f"DATABASE ENTRY ID: {db_content['ids'][i]}")
@@ -139,3 +160,21 @@ if __name__ == "__main__":
         print(f"\n[VECTOR PREVIEW (First 5 of 1536)]: ")
         print(f"  {vector_preview}")
         print(f"{'='*50}")
+
+    choice = input("Enter your choice (1 or 2): ").strip()
+
+    if choice == "1":
+        print("\n🗑️  Resetting the database collection...")
+        try:
+            store.clear_store()
+            db_content_after = store.vector_db.get()
+            print(f"📊 Confirmed active records remaining: {len(db_content_after['ids'])}")
+        except Exception as e:
+            print(f"❌ [Test Failure] Could not clear collection: {e}")
+    elif choice == "2":
+        print("\n💾 Data retained on disk. Exiting safely.")
+        db_content_after = store.vector_db.get()
+        print(f"📊 Confirmed active records remaining: {len(db_content_after['ids'])}")
+    else:
+        print("\n⚠️  Invalid input received. Defaulting to Option 2: Retaining data.")
+

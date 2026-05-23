@@ -5,11 +5,13 @@ from langgraph.graph import StateGraph, START, END
 from langchain_openai import ChatOpenAI
 from src.agents.schemas import Persona
 from src.database.persona_store import PersonaStore
+from src.database.vector_store import EmailVectorStore
 from src.ingestion.email_parser import parse_eml
 
 load_dotenv()
 
 persona_db = PersonaStore()
+vector_db_store = EmailVectorStore()
 
 # Define the State
 class IngestionState(TypedDict):
@@ -101,16 +103,26 @@ def llm_update_node(state: IngestionState) -> IngestionState:
     return {"updated_persona": new_persona}
 
 def save_node(state: IngestionState) -> IngestionState:
-    """Saves the final output to TinyDB."""
-    print("[Node: Save] Writing to TinyDB...")
+    """Saves the final output to TinyDB and populates ChromaDB vectors."""
+    print("[Node: Save] Writing to TinyDB & ChromaDB...")
     
     # 1. Convert the Pydantic model to a standard dictionary for TinyDB
     persona_dict = state["updated_persona"].model_dump()
     
     # 2. Explicitly force the database key to be the factual email
     persona_dict["email"] = state["contact_email"]
-    
     persona_db.upsert_persona(persona_dict)
+    
+    # 3. Save the email content to ChromaDB using a fresh instance handle
+    try:
+        parsed_payload = state["parsed_email"]
+        
+        fresh_vector_store = EmailVectorStore()
+        fresh_vector_store.upsert_email(parsed_payload)
+        
+    except Exception as e:
+        print(f"❌ [Graph Save Error] Failed to write to ChromaDB: {e}")
+        
     return state
 
 workflow = StateGraph(IngestionState)

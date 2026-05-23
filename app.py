@@ -2,11 +2,19 @@ import streamlit as st
 import time
 import os
 import tempfile
+from src.database.vector_store import EmailVectorStore
 from src.agents.protection_graph import protection_app
 from src.agents.ingestion_graph import ingestion_app
 
 # --- UI CONFIGURATION ---
 st.set_page_config(page_title="Misdirected Email Protection", layout="wide", page_icon="🛡️")
+
+# --- DATABASE INITIALIZATION ---
+@st.cache_resource
+def get_vector_store():
+    return EmailVectorStore()
+
+store = get_vector_store()
 
 # --- SESSION STATE INITIALIZATION ---
 if "memory_initialized" not in st.session_state:
@@ -17,6 +25,27 @@ if "current_draft" not in st.session_state:
     st.session_state.current_draft = None
 if "ingestion_method" not in st.session_state:
     st.session_state.ingestion_method = None  # Tracks "upload" or "local"
+
+# --- GLOBAL DATABASE MONITOR (Visible in both Phase 1 and Phase 2) ---
+st.set_page_config(initial_sidebar_state="collapsed")
+
+with st.sidebar:
+    # Use st.expander here instead of st.header
+    st.header("📊 Database Monitor")
+    try:
+        db_content = store.vector_db.get()
+        record_count = len(db_content.get('ids', []))
+        
+        st.metric(label="Active Emails in ChromaDB", value=record_count)
+        
+        if record_count > 0:
+            with st.expander("Show stored Email IDs"):
+                st.json(db_content['ids'])
+        else:
+            st.info("ChromaDB collection is empty.")
+    except Exception as e:
+        st.error(f"Error reading DB status: {e}")
+
 
 # --- HEADER ---
 st.title("🛡️ LLM Based Misdirected Email Protection System")
@@ -96,6 +125,7 @@ else:
     if st.button("← Reset Agent Memory & Start Over"):
         # Wipe and clear TinyDB
         tinydb_path = os.path.join("data", "personas", "personas.json")
+        #email_vector_strore_path = os.path.join("data", "email_vectore_store", "personas.json")
         
         try:
             os.makedirs(os.path.dirname(tinydb_path), exist_ok=True)
@@ -103,6 +133,9 @@ else:
             with open(tinydb_path, 'w', encoding='utf-8') as f:
                 f.write('{}') 
                 
+            # This will now reference the globally active store object and clear ChromaDB
+            store.clear_store()
+            
             st.toast("🧹 Database successfully cleared!", icon="🗑️")
             time.sleep(1.5)
             print("\n🧹 Database file successfully wiped and cleared!\n")
@@ -119,7 +152,7 @@ else:
         st.rerun()
         
     st.divider()
-    
+ 
     col1, col2 = st.columns([1, 1.2])
 
     # LEFT COLUMN: THE EMAIL CLIENT
