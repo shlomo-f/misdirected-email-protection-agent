@@ -30,7 +30,6 @@ if "ingestion_method" not in st.session_state:
 st.set_page_config(initial_sidebar_state="collapsed")
 
 with st.sidebar:
-    # Use st.expander here instead of st.header
     st.header("📊 Database Monitor")
     try:
         db_content = store.vector_db.get()

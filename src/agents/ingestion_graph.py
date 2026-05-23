@@ -106,14 +106,12 @@ def save_node(state: IngestionState) -> IngestionState:
     """Saves the final output to TinyDB and populates ChromaDB vectors."""
     print("[Node: Save] Writing to TinyDB & ChromaDB...")
     
-    # 1. Convert the Pydantic model to a standard dictionary for TinyDB
     persona_dict = state["updated_persona"].model_dump()
     
-    # 2. Explicitly force the database key to be the factual email
     persona_dict["email"] = state["contact_email"]
     persona_db.upsert_persona(persona_dict)
     
-    # 3. Save the email content to ChromaDB using a fresh instance handle
+    # Save the email content to ChromaDB using a fresh instance handle
     try:
         parsed_payload = state["parsed_email"]
         
