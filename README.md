@@ -84,7 +84,6 @@ streamlit run app.py
 https://github.com/user-attachments/assets/65fa4b77-dc8f-48f0-8070-7b8fcd5ddd88
 
 ## 🗺️ Production Roadmap
-* **Intelligent Recipient Remediation & Autocomplete Correction:** When a contextual anomaly triggers a warning state, the Gatekeeper Graph will analyze the extracted high-density keyword vectors against the global database of internal/external personas. Instead of just blocking the communication, the system will dynamically compute the closest semantic match across all known contacts and proactively suggest the intended recipient (e.g., *"Did you mean Joe from Company X instead of Joe from Company Y?"*).
 * **Deep Attachment Inspection:** Transition from metadata-only attachment tracking to full binary parsing (extracting raw text from `.pdf`, `.docx`, and `.xlsx` payloads) using deep-inspection pipelines.
 * **Risk-Score Calibration:** Incorporate enterprise-specific risk weights based on classification tags (e.g., `CONFIDENTIAL`, `INTERNAL ONLY`).
 * **Native Client Integrations (Gmail Workspace Add-on / Outlook VSTO Add-in):** Transition from a demo to a client extension. Intercept outbound drafts directly within the user's native email client using real-time API triggers before the `Send` event completes
