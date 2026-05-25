@@ -161,9 +161,9 @@ else:
         # Determine default values based on the ingestion method used
         if st.session_state.ingestion_method == "local":
             default_recipient = "robert@global-vector-dynamics.com"
-            default_subject = "TechStars Q4 Marketing Reallocation"
-            default_body = "Hi Robert,\n\nPlease review the attached TechStars marketing spend. We need to cut the ad budget by 15%."
-            default_attachments = "TechStars_Budget_v2.pdf"
+            default_subject = "Register Maps & Security Controls Alignment"
+            default_body = "Hi Robert,\n\nFollowing up on our architecture review. Please ensure we have the Modbus/TCP register maps ready before our kickoff call this Thursday."
+            default_attachments = "NY_CleanGen_Architecture_Specs.pdf"
         else:
             default_recipient = ""
             default_subject = ""
@@ -229,10 +229,12 @@ else:
             elif verdict.status == "WARN":
                 st.error(f"⚠️ **STATUS: WARNING (Risk Score: {verdict.risk_score}/100)**")
                 st.write(f"**Agent Reasoning:** \n{verdict.reasoning}")
+                st.write(f"**Did you mean?:** \n{verdict.suggested_recipient}")
+                st.write(f"**Suggested because:** \n{verdict.suggestion_reason}")
                 
                 if verdict.flagged_context:
                     st.warning(f"**Flagged Entities:** {', '.join(verdict.flagged_context)}")
-                
+                                    
                 st.divider()
                 st.markdown("### Action Required")
                 

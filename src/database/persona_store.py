@@ -24,6 +24,32 @@ class PersonaStore:
         self.db.upsert(persona_dict, self.User.email == email)
 
         print(f"✅ Persona saved for: {email}")
+    
+    def search_by_name_or_prefix(self, prefix: str) -> list[dict]:
+        """
+        Searches personas where the email prefix or inferred names 
+        contain the search prefix (e.g., 'robert' matches 'robert@global-energy.com').
+        """
+        self.db.clear_cache()
+        prefix_clean = prefix.lower().strip()
+        
+        def match_condition(doc):
+            # Check email prefix
+            doc_email = doc.get("email", "").lower()
+            doc_prefix = doc_email.split("@")[0] if "@" in doc_email else ""
+            if prefix_clean in doc_prefix:
+                return True
+                
+            # Check inferred names list
+            names = doc.get("inferred_names", [])
+            if isinstance(names, str):
+                names = [names]
+            if any(prefix_clean in name.lower() for name in names):
+                return True
+                
+            return False
+
+        return self.db.search(match_condition)
 
     def get_persona(self, email: str) -> dict:
         """
@@ -39,24 +65,44 @@ class PersonaStore:
 
 # --- Test Script ---
 if __name__ == "__main__":
-    # Launch the store
     store = PersonaStore()
     
-    # Create a mock Persona dictionary (matching the Pydantic schema structure)
-    mock_persona = {
+    lewis_amazon = {
         "email": "lewis@amazon.com",
-        "inferred_name": "Lewis Chao",
+        "inferred_names": ["Lewis Chao"], 
         "company": "Amazon",
         "job_title": "CFO",
         "relationship_to_sender": "Client",
-        "known_topics": ["Q3 Budget", "Project Phoenix"],
+        "known_topics": ["Q3 Budget"],
         "last_updated": "2026-05-17",
         "last_talked": "2026-05-17"
     }
     
-    print("Testing Save...")
-    store.upsert_persona(mock_persona)
+    lewis_house = {
+        "email": "lewis.bill@house-set-solutions.com",
+        "inferred_names": ["Lewis Bill"],   
+        "company": "House Set Solutions",
+        "job_title": "CEO",
+        "relationship_to_sender": "Prospect",
+        "known_topics": ["Real Estate Strategy"],
+        "last_updated": "2026-05-25",
+        "last_talked": "2026-05-25"
+    }
     
-    print("\nTesting Retrieval...")
-    retrieved = store.get_persona("lewis@amazon.com")
-    print(retrieved)
+    print("Saving personas...")
+    store.upsert_persona(lewis_amazon)
+    store.upsert_persona(lewis_house)
+    
+    # Test Prefix Search
+    print("\n--- Testing Search for 'lew' ---")
+    results_lew = store.search_by_name_or_prefix("lew")
+    print(f"Found {len(results_lew)} results:")
+    for doc in results_lew:
+        print(f"- {doc['email']} ({doc.get('company')})")
+        
+    print("\n--- Testing Search for 'l' ---")
+    results_l = store.search_by_name_or_prefix("l")
+    print(f"Found {len(results_l)} results:")
+    for doc in results_l:
+        print(f"- {doc['email']} ({doc.get('company')})")
+    
