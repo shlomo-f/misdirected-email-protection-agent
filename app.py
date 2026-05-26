@@ -229,8 +229,10 @@ else:
             elif verdict.status == "WARN":
                 st.error(f"⚠️ **STATUS: WARNING (Risk Score: {verdict.risk_score}/100)**")
                 st.write(f"**Agent Reasoning:** \n{verdict.reasoning}")
-                st.write(f"**Did you mean?:** \n{verdict.suggested_recipient}")
-                st.write(f"**Suggested because:** \n{verdict.suggestion_reason}")
+                
+                if verdict.suggested_recipient:
+                    st.write(f"**Did you mean?:** \n{verdict.suggested_recipient}")
+                    st.write(f"**Suggested because:** \n{verdict.suggestion_reason}")
                 
                 if verdict.flagged_context:
                     st.warning(f"**Flagged Entities:** {', '.join(verdict.flagged_context)}")
